@@ -46,15 +46,6 @@ class toDoTransactions {
             console.log(err);
         }
     }
-    async checkUser(userEmail,userPassword){
-        try {
-            await db.connect();
-            const result = await db.query`select * from tbl_User Where Email=${userEmail} AND Password=${userPassword}`;
-            return result;
-        } catch (err) {        
-            console.log(err);
-        }
-    }
     async getToDoList(userId){
         try {
             await db.connect();
