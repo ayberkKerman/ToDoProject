@@ -1,0 +1,23 @@
+{
+  "name": "to-do-app-master",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "chance": "^1.1.9",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "http-status-codes": "^2.2.0",
+    "msnodesqlv8": "^3.0.1",
+    "mssql": "^9.0.1",
+    "nodemon": "^2.0.20",
+    "require-directory": "^2.1.1"
+  }
+}
