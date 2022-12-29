@@ -30,13 +30,13 @@ class ToDoRouter {
     return result;
   }
 
-  async getAsyncDetail(Id){
-    const result=toDoTransactions.getToDoDetail(Id);
+  async getAsyncDetail(id){
+    const result=toDoTransactions.getToDoDetail(id);
     return result;
   }
 
-  async getAsync(userId){
-    const result=toDoTransactions.getToDoList(userId);
+  async getAsync(id){
+    const result=toDoTransactions.getToDoList(id);
     return result;
   }
   

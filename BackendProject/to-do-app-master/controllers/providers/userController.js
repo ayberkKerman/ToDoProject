@@ -12,16 +12,20 @@ class userController {
         return verificationCode;
           
     }
-    async changePassword(email,password){
-        userTransactions.changePassword(email,password);
+    async changePassword(userEmail,userPassword){
+        userTransactions.changePassword(userEmail,userPassword);
     
     }
     async createUser(user){
         const result=userTransactions.createUser(user);
         return result;
     }
-    async checkUserExist(userEmail,userPassword){
-        const result=userTransactions.checkUser(userEmail,userPassword);
+    async checkUserExist(userEmail){
+        const result=userTransactions.checkUser(userEmail);
+        return result;
+    }
+    async loginCheckUserExist(userEmail,userPassword){
+        const result=userTransactions.loginCheckUser(userEmail,userPassword);
         return result;
     }
     async getEditor(){

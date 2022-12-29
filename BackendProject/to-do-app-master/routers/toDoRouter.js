@@ -1,8 +1,10 @@
 const router = require("express")();
 const HttpStatusCode = require("http-status-codes");
-//const { urlShortingValidator } = require("../middleware/validators");
+const { toDoValidator } = require("../middleware/validators");
+
 const ControllerFactory = require("../controllers/controllerFactory");
-const nodemailer = require('nodemailer')
+const nodemailer = require('nodemailer');
+const { Router } = require("express");
 
 const toDoController = ControllerFactory.creating(
   "toDoController"
@@ -11,27 +13,10 @@ const userController = ControllerFactory.creating(
   "userController"
 );
 // !!!!!!!!!!!!! fiil yerine isim yapılacak urlleri
-/*
-let transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: 'ayberkkerman2@gmail.com',
-    pass: 'drlovidjeemfpnyf'
-  }
-})
 
-let mailOptions={
-  from: 'ayberkkerman2@gmail.com',
-  to: ' ayberkkerman2@gmail.com',
-  subject: 'Nodemailer Test',
-  text: "Deneme"
-}
-transporter.sendMail(mailOptions,(err,data)=>{
-  if(err) console.log(err)
-  else console.log("mail gönderildi");
-})
-*/
-router.get("/api/mail/:userEmail", async (req, res) => {
+router.get("/api/mail/:userEmail",
+toDoValidator.isEmailValid,
+ async (req, res) => {
     
   try {
     const response = await userController.generateVerificationCode();
@@ -51,7 +36,7 @@ router.get("/api/mail/:userEmail", async (req, res) => {
     }
     transporter.sendMail(mailOptions,(err,data)=>{
       if(err) console.log(err)
-      else console.log("mail gönderildi");
+      else console.log("Mail Sent");
     })
 
     res.json(response);
@@ -64,10 +49,11 @@ router.get("/api/mail/:userEmail", async (req, res) => {
 
 
 router.put(
-  "/api/to-does/change",
-  //urlShortingValidator.decode,
+  "/api/to-does",
+  toDoValidator.isIdAndToDoValid,
   async (req, res) => {
     try {
+      
       const response = await toDoController.changeToDo(
         req.body.id,req.body.toDo
       );
@@ -88,8 +74,8 @@ router.put(
 
 
 router.post(
-  "/Create",
-  //urlShortingValidator.insert,
+  "/api/to-do",
+  toDoValidator.isToDoValid,
   async (req, res) => {
     try {
       const response = await toDoController.createToDo(req.body);
@@ -105,7 +91,7 @@ router.post(
 
 router.delete(
   "/api/delete/:id",
-  //urlShortingValidator.insert,
+  toDoValidator.isValidId,
   async (req, res) => {
     try {
       const response = await toDoController.deleteToDo(req.params.id);
@@ -120,7 +106,7 @@ router.delete(
 
 router.delete(
   "/api/user/:id",
-  //urlShortingValidator.insert,
+  toDoValidator.isValidId,
   async (req, res) => {
     try {
       const response = await userController.deleteEditor(req.params.id);
@@ -134,8 +120,8 @@ router.delete(
 );
 
 router.put(
-  "/api/to-does/change-Is-Completed",
-  //urlShortingValidator.decode,
+  "/api/to-does/is-completed",
+  toDoValidator.isIdAndToDoValid,
   async (req, res) => {
     try {
       const response = await toDoController.changeIsCompleted(
@@ -159,7 +145,7 @@ router.put(
 
 router.put(
   "/api/user-password",
-  //urlShortingValidator.decode,
+  toDoValidator.isEmailAndPasswordValidBody,
   async (req, res) => {
     try {
       const response = await userController.changePassword(
@@ -184,7 +170,7 @@ router.put(
 
 router.post(
   "/api/user",
-  //urlShortingValidator.insert,
+  toDoValidator.isUserValid,
   async (req, res) => {
     try {
       const response = await userController.createUser(req.body);
@@ -197,11 +183,26 @@ router.post(
   }
 );
 
-router.get("/api/user/:userEmail/:userPassword", async (req, res) => {
-    
-    try {
-        
-        const response = await userController.checkUserExist(req.params.userEmail,req.params.userPassword);
+router.get(
+  "/api/user/:userEmail",
+   toDoValidator.isEmailValid, 
+ async (req, res) => {
+    try { 
+        const response = await userController.checkUserExist(req.params.userEmail);
+        res.json(response);
+    } catch (err) {
+        res
+        .status(err.status || HttpStatusCode.INTERNAL_SERVER_ERROR)
+        .send(err.message);
+    }
+});
+
+router.get(
+  "/api/user/:userEmail/:userPassword",
+   toDoValidator.isEmailAndPasswordValid, 
+ async (req, res) => {
+    try { 
+        const response = await userController.loginCheckUserExist(req.params.userEmail,req.params.userPassword);
         res.json(response);
     } catch (err) {
         res
@@ -211,9 +212,7 @@ router.get("/api/user/:userEmail/:userPassword", async (req, res) => {
 });
 
 router.get("/api/editor", async (req, res) => {
-    
   try {
-      
       const response = await userController.getEditor();
       res.json(response);
   } catch (err) {
@@ -224,7 +223,6 @@ router.get("/api/editor", async (req, res) => {
 });
 
 router.get("/api/user", async (req, res) => {
-    
   try {
     const response = await userController.getUser();
     res.json(response);
@@ -237,7 +235,9 @@ router.get("/api/user", async (req, res) => {
 
 
 
-router.get("/api/to-does/:id", async (req, res) => {
+router.get("/api/to-does/:id",
+toDoValidator.isValidId,
+ async (req, res) => {
     try {
         const response = await toDoController.getAsync(req.params.id);
         res.json(response);
@@ -248,7 +248,9 @@ router.get("/api/to-does/:id", async (req, res) => {
     }
 });
 
-router.get("/api/to-do/detail/:id", async (req, res) => {
+router.get("/api/to-do/detail/:id",
+toDoValidator.isValidId,
+ async (req, res) => {
   try {
       const response = await toDoController.getAsyncDetail(req.params.id);
       res.json(response);
